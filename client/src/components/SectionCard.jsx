@@ -4,12 +4,12 @@ const SectionCard = ({ title, subtitle, children, action, sx = {} }) => (
   <Card
     sx={{
       height: '100%',
-      borderRadius: 5,
+      borderRadius: 3,
       overflow: 'hidden',
       ...sx,
     }}
   >
-    <CardContent sx={{ p: 3.25 }}>
+    <CardContent sx={{ p: 3 }}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         justifyContent="space-between"

@@ -5,11 +5,8 @@ const StatCard = ({ icon, label, value, accent = 'primary.main' }) => (
   <Card
     sx={{
       height: '100%',
-      background: (theme) =>
-        `linear-gradient(160deg, ${alpha(theme.palette.common.white, theme.palette.mode === 'dark' ? 0.04 : 0.75)}, ${alpha(
-          theme.palette.primary.main,
-          theme.palette.mode === 'dark' ? 0.14 : 0.1,
-        )})`,
+      borderRadius: 3,
+      bgcolor: 'background.paper',
     }}
   >
     <CardContent sx={{ p: 3 }}>
@@ -24,11 +21,11 @@ const StatCard = ({ icon, label, value, accent = 'primary.main' }) => (
           alignItems="center"
           justifyContent="center"
           sx={{
-            width: 52,
-            height: 52,
-            borderRadius: 3,
+            width: 44,
+            height: 44,
+            borderRadius: 2,
             color: accent,
-            bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12),
+            bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
           }}
         >
           {icon}

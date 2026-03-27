@@ -82,7 +82,7 @@ export const buildTheme = (mode) => {
       },
     },
     shape: {
-      borderRadius: 18,
+      borderRadius: 4,
     },
     components: {
       MuiCssBaseline: {
@@ -133,16 +133,17 @@ export const buildTheme = (mode) => {
             border: 'none',
             boxShadow:
               mode === 'dark'
-                ? '0 10px 26px rgba(0, 0, 0, 0.16)'
-                : '0 10px 26px rgba(15, 23, 42, 0.04)',
+                ? '0 4px 16px rgba(0, 0, 0, 0.08)'
+                : '0 4px 16px rgba(15, 23, 42, 0.03)',
           },
         },
       },
       MuiButton: {
         styleOverrides: {
           root: {
-            borderRadius: 14,
+            borderRadius: 8,
             paddingInline: 18,
+            boxShadow: 'none',
           },
           outlined: {
             borderColor: alpha(colors.primary, mode === 'dark' ? 0.42 : 0.28),
@@ -156,7 +157,7 @@ export const buildTheme = (mode) => {
       MuiChip: {
         styleOverrides: {
           root: {
-            borderRadius: 999,
+            borderRadius: 8,
             border: 'none',
           },
         },
@@ -165,7 +166,7 @@ export const buildTheme = (mode) => {
         styleOverrides: {
           root: {
             backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.02)' : '#ffffff',
-            borderRadius: 14,
+            borderRadius: 8,
             '& .MuiOutlinedInput-notchedOutline': {
               borderColor: alpha(colors.text, mode === 'dark' ? 0.12 : 0.1),
             },

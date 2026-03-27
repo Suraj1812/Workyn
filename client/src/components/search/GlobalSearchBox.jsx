@@ -80,6 +80,7 @@ const GlobalSearchBox = () => {
               right: 0,
               zIndex: 15,
               p: 1,
+              borderRadius: 3,
             }}
           >
             <List disablePadding>

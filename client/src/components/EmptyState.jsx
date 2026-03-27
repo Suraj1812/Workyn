@@ -8,7 +8,7 @@ const EmptyState = ({ title, description, actionLabel, onAction }) => (
       textAlign: 'center',
       border: '1px dashed',
       borderColor: 'divider',
-      borderRadius: 4,
+      borderRadius: 3,
     }}
   >
     <Typography variant="h6" sx={{ mb: 1 }}>

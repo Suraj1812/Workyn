@@ -54,7 +54,7 @@ const NotificationDrawer = ({ open, onClose }) => {
               }}
               sx={{
                 mb: 1,
-                borderRadius: 3,
+                borderRadius: 2,
                 bgcolor: notification.isRead ? 'transparent' : 'action.hover',
               }}
             >

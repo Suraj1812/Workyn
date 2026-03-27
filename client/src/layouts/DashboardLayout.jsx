@@ -100,7 +100,7 @@ const DashboardLayout = () => {
             onClick={() => setMobileOpen(false)}
             sx={{
               mb: 1,
-              borderRadius: 3,
+              borderRadius: 2,
               '&.active, &.Mui-selected': {
                 bgcolor: 'primary.main',
                 color: 'primary.contrastText',
@@ -116,13 +116,7 @@ const DashboardLayout = () => {
         ))}
       </List>
       <Box sx={{ p: 2 }}>
-        <Box
-          sx={{
-            p: 2.5,
-            borderRadius: 4,
-            backgroundColor: 'transparent',
-          }}
-        >
+        <Box sx={{ p: 1 }}>
           <Typography variant="subtitle1" sx={{ mb: 0.75 }}>
             Focused all-in-one operations
           </Typography>
