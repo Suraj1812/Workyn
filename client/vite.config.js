@@ -15,11 +15,7 @@ export default defineConfig({
             return undefined;
           }
 
-          if (
-            id.includes('html2canvas') ||
-            id.includes('canvg') ||
-            id.includes('svg-pathdata')
-          ) {
+          if (id.includes('html2canvas') || id.includes('canvg') || id.includes('svg-pathdata')) {
             return 'resume-capture';
           }
 
