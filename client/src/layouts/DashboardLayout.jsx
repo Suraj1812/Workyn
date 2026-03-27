@@ -43,7 +43,7 @@ import GlobalSearchBox from '../components/search/GlobalSearchBox.jsx';
 import { useAI } from '../context/AIContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useNotifications } from '../context/NotificationsContext.jsx';
-import { useThemeMode } from '../context/ThemeModeContext.jsx';
+import { useThemeMode } from '../context/useThemeMode.js';
 
 const drawerWidth = 280;
 

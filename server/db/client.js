@@ -2,6 +2,21 @@ import { Pool } from 'pg';
 
 let pool;
 
+const parseDatabaseUrl = (connectionString) => {
+  const url = new URL(connectionString);
+  const sslMode = url.searchParams.get('sslmode');
+  const useSsl = process.env.NODE_ENV === 'production' || sslMode === 'require';
+
+  return {
+    host: url.hostname,
+    port: Number(url.port || 5432),
+    user: decodeURIComponent(url.username),
+    password: decodeURIComponent(url.password),
+    database: url.pathname.replace(/^\//, ''),
+    ssl: useSsl ? { rejectUnauthorized: false } : false,
+  };
+};
+
 export const getPool = () => {
   if (!pool) {
     const connectionString = process.env.DATABASE_URL;
@@ -10,10 +25,7 @@ export const getPool = () => {
       throw new Error('DATABASE_URL is not configured.');
     }
 
-    pool = new Pool({
-      connectionString,
-      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-    });
+    pool = new Pool(parseDatabaseUrl(connectionString));
   }
 
   return pool;

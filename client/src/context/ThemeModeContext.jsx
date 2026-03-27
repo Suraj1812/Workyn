@@ -1,9 +1,8 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 
 import { buildTheme } from '../theme/index.js';
-
-const ThemeModeContext = createContext(null);
+import ThemeModeContext from './theme-mode-context.js';
 
 const getInitialMode = () => {
   const savedMode = localStorage.getItem('workyn-theme');
@@ -37,14 +36,4 @@ export const ThemeModeProvider = ({ children }) => {
       </ThemeProvider>
     </ThemeModeContext.Provider>
   );
-};
-
-export const useThemeMode = () => {
-  const context = useContext(ThemeModeContext);
-
-  if (!context) {
-    throw new Error('useThemeMode must be used within ThemeModeProvider.');
-  }
-
-  return context;
 };

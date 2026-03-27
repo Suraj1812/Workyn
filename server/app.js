@@ -48,7 +48,12 @@ app.use(
   }),
 );
 app.use(compression());
-app.use(morgan('combined', { stream: morganStream }));
+app.use(
+  morgan('combined', {
+    stream: morganStream,
+    skip: (req, res) => req.path === '/api/auth/me' && res.statusCode === 401,
+  }),
+);
 
 app.use(
   cors({

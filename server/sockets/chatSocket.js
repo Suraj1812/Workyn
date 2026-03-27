@@ -8,6 +8,7 @@ import { createChatMessage } from '../utils/chat.js';
 import { findUserById, setUserCurrentWorkspace } from '../repositories/usersRepository.js';
 import {
   findMembershipByUserAndWorkspace,
+  findWorkspaceById,
   listMembershipsByUser,
 } from '../repositories/workspacesRepository.js';
 
@@ -91,20 +92,29 @@ export const authenticateSocket = async (socket, next) => {
     let membership =
       user.currentWorkspaceId &&
       (await findMembershipByUserAndWorkspace(user.id, user.currentWorkspaceId));
+    let workspace =
+      membership?.workspace ||
+      memberships.find((item) => item.workspaceId === membership?.workspaceId)?.workspace ||
+      null;
 
     if (!membership) {
       membership = memberships[0] || null;
       if (membership?.workspaceId && membership.workspaceId !== user.currentWorkspaceId) {
         user = await setUserCurrentWorkspace(user.id, membership.workspaceId);
       }
+      workspace = membership?.workspace || null;
     }
 
-    if (!membership) {
+    if (!workspace && membership?.workspaceId) {
+      workspace = await findWorkspaceById(membership.workspaceId);
+    }
+
+    if (!membership || !workspace) {
       return next(new Error('Unauthorized'));
     }
 
     socket.user = user;
-    socket.workspace = membership.workspace;
+    socket.workspace = workspace;
     socket.membership = membership;
     next();
   } catch (error) {
@@ -114,7 +124,12 @@ export const authenticateSocket = async (socket, next) => {
 
 export const registerChatHandlers = (io, socket) => {
   const userId = socket.user.id;
-  const workspaceId = socket.workspace.id;
+  const workspaceId = socket.workspace?.id;
+
+  if (!workspaceId) {
+    socket.disconnect(true);
+    return;
+  }
 
   if (!userSockets.has(userId)) {
     userSockets.set(userId, new Set());
