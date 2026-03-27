@@ -1,8 +1,15 @@
 import { Card, CardContent, Stack, Typography } from '@mui/material';
 
 const SectionCard = ({ title, subtitle, children, action, sx = {} }) => (
-  <Card sx={{ height: '100%', ...sx }}>
-    <CardContent sx={{ p: 3 }}>
+  <Card
+    sx={{
+      height: '100%',
+      borderRadius: 5,
+      overflow: 'hidden',
+      ...sx,
+    }}
+  >
+    <CardContent sx={{ p: 3.25 }}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         justifyContent="space-between"

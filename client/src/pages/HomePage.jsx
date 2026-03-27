@@ -19,6 +19,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import { alpha, useTheme } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
 
 import Seo from '../components/Seo.jsx';
@@ -95,6 +96,36 @@ const faqs = [
 
 const HomePage = () => {
   const { user } = useAuth();
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+
+  const heroShellSx = {
+    p: { xs: 3, md: 5 },
+    borderRadius: { xs: 5, md: 6 },
+    background: isDark
+      ? 'linear-gradient(135deg, rgba(7,24,38,0.96) 0%, rgba(11,34,49,0.94) 45%, rgba(54,37,18,0.88) 100%)'
+      : 'linear-gradient(135deg, rgba(235,249,248,0.98) 0%, rgba(243,248,255,0.96) 50%, rgba(255,244,230,0.96) 100%)',
+    overflow: 'hidden',
+    mb: 4,
+    boxShadow: isDark ? '0 30px 80px rgba(0, 0, 0, 0.28)' : '0 30px 80px rgba(15, 23, 42, 0.08)',
+  };
+
+  const heroPanelSx = {
+    p: { xs: 2.5, md: 3 },
+    borderRadius: 5,
+    border: `1px solid ${alpha(theme.palette.common.white, isDark ? 0.12 : 0.08)}`,
+    bgcolor: isDark ? 'rgba(9, 18, 31, 0.76)' : 'rgba(255,255,255,0.88)',
+    backdropFilter: 'blur(18px)',
+    color: isDark ? '#f6fbff' : 'text.primary',
+  };
+
+  const heroMiniCardSx = {
+    p: 2.2,
+    height: '100%',
+    borderRadius: 4,
+    border: `1px solid ${alpha(theme.palette.common.white, isDark ? 0.1 : 0.08)}`,
+    bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(8,17,32,0.04)',
+  };
 
   return (
     <Box sx={{ py: { xs: 3, md: 5 } }}>
@@ -119,19 +150,7 @@ const HomePage = () => {
       />
 
       <Container maxWidth="xl">
-        <Paper
-          elevation={0}
-          sx={{
-            p: { xs: 3, md: 5 },
-            borderRadius: 6,
-            border: '1px solid',
-            borderColor: 'divider',
-            background:
-              'linear-gradient(135deg, rgba(11,125,119,0.18) 0%, rgba(250,140,22,0.14) 100%)',
-            overflow: 'hidden',
-            mb: 4,
-          }}
-        >
+        <Paper elevation={0} sx={heroShellSx}>
           <Stack
             direction={{ xs: 'column', md: 'row' }}
             justifyContent="space-between"
@@ -149,13 +168,23 @@ const HomePage = () => {
               <Typography variant="h4">Workyn</Typography>
             </Stack>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-              <Button component={RouterLink} to="/login" variant="text" color="inherit">
+              <Button
+                component={RouterLink}
+                to="/login"
+                variant={isDark ? 'outlined' : 'text'}
+                color="inherit"
+                sx={{
+                  color: isDark ? '#f6fbff' : 'text.primary',
+                  borderColor: isDark ? 'rgba(255,255,255,0.16)' : undefined,
+                }}
+              >
                 Sign in
               </Button>
               <Button
                 component={RouterLink}
                 to={user ? '/dashboard' : '/register'}
                 variant="contained"
+                color="primary"
               >
                 {user ? 'Open dashboard' : 'Start free'}
               </Button>
@@ -167,15 +196,27 @@ const HomePage = () => {
               <Chip
                 label="AI-powered operating system for modern teams"
                 color="secondary"
-                sx={{ mb: 2, fontWeight: 700 }}
+                sx={{ mb: 2, fontWeight: 700, alignSelf: 'flex-start' }}
               />
-              <Typography variant="h1" sx={{ fontSize: { xs: 40, md: 64 }, lineHeight: 1.04 }}>
+              <Typography
+                variant="h1"
+                sx={{
+                  fontSize: { xs: 40, md: 64 },
+                  lineHeight: 1.04,
+                  maxWidth: 720,
+                  textWrap: 'balance',
+                }}
+              >
                 Run chat, CRM, hiring, and clinic operations from one focused workspace.
               </Typography>
               <Typography
                 variant="h6"
-                color="text.secondary"
-                sx={{ mt: 2.5, maxWidth: 760, lineHeight: 1.65 }}
+                sx={{
+                  mt: 2.5,
+                  maxWidth: 760,
+                  lineHeight: 1.65,
+                  color: isDark ? 'rgba(246,251,255,0.74)' : 'text.secondary',
+                }}
               >
                 Workyn brings together realtime communication, lead management, resume creation,
                 patient workflows, analytics, billing, team collaboration, and in-house AI
@@ -188,10 +229,17 @@ const HomePage = () => {
                   to={user ? '/dashboard' : '/register'}
                   size="large"
                   variant="contained"
+                  sx={{ minWidth: 220 }}
                 >
                   {user ? 'Go to workspace' : 'Create your workspace'}
                 </Button>
-                <Button component={RouterLink} to="/login" size="large" variant="outlined">
+                <Button
+                  component={RouterLink}
+                  to="/login"
+                  size="large"
+                  variant="outlined"
+                  sx={{ minWidth: 220 }}
+                >
                   Existing customer login
                 </Button>
               </Stack>
@@ -201,24 +249,59 @@ const HomePage = () => {
                 spacing={1.5}
                 sx={{ mt: 4, flexWrap: 'wrap' }}
               >
-                <Chip icon={<WorkspacesRounded />} label="Multi-module SaaS platform" />
-                <Chip icon={<AutoAwesomeRounded />} label="No external AI APIs required" />
-                <Chip icon={<FavoriteRounded />} label="Built for teams and clinics" />
+                <Chip
+                  icon={<WorkspacesRounded />}
+                  label="Multi-module SaaS platform"
+                  sx={{
+                    bgcolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(8,17,32,0.05)',
+                    color: isDark ? '#f6fbff' : 'text.primary',
+                  }}
+                />
+                <Chip
+                  icon={<AutoAwesomeRounded />}
+                  label="No external AI APIs required"
+                  sx={{
+                    bgcolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(8,17,32,0.05)',
+                    color: isDark ? '#f6fbff' : 'text.primary',
+                  }}
+                />
+                <Chip
+                  icon={<FavoriteRounded />}
+                  label="Built for teams and clinics"
+                  sx={{
+                    bgcolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(8,17,32,0.05)',
+                    color: isDark ? '#f6fbff' : 'text.primary',
+                  }}
+                />
               </Stack>
             </Grid>
 
             <Grid item xs={12} lg={5}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 3,
-                  borderRadius: 5,
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  bgcolor: 'rgba(255,255,255,0.74)',
-                  backdropFilter: 'blur(16px)',
-                }}
-              >
+              <Paper elevation={0} sx={heroPanelSx}>
+                <Stack spacing={1} sx={{ mb: 2.5 }}>
+                  <Typography
+                    variant="overline"
+                    sx={{
+                      letterSpacing: 1.4,
+                      color: isDark ? 'rgba(246,251,255,0.62)' : 'text.secondary',
+                    }}
+                  >
+                    Platform overview
+                  </Typography>
+                  <Typography variant="h4" sx={{ maxWidth: 420 }}>
+                    Designed to replace scattered tools with one operational core.
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: isDark ? 'rgba(246,251,255,0.72)' : 'text.secondary',
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    Every module stays connected, so your team can move from conversations to
+                    follow-ups, resumes, appointments, and analytics without losing context.
+                  </Typography>
+                </Stack>
+
                 <Grid container spacing={2}>
                   {[
                     ['Modules', 'Chat, CRM, Resume, Clinic'],
@@ -227,21 +310,26 @@ const HomePage = () => {
                     ['Monetization', 'Free and Pro subscription support'],
                   ].map(([label, value]) => (
                     <Grid item xs={12} sm={6} key={label}>
-                      <Paper
-                        elevation={0}
-                        sx={{
-                          p: 2,
-                          height: '100%',
-                          borderRadius: 4,
-                          bgcolor: 'rgba(8,17,32,0.04)',
-                          border: '1px solid',
-                          borderColor: 'divider',
-                        }}
-                      >
-                        <Typography variant="overline" color="text.secondary">
+                      <Paper elevation={0} sx={heroMiniCardSx}>
+                        <Typography
+                          variant="overline"
+                          sx={{
+                            display: 'block',
+                            lineHeight: 1.2,
+                            letterSpacing: 1.2,
+                            color: isDark ? 'rgba(246,251,255,0.62)' : 'text.secondary',
+                          }}
+                        >
                           {label}
                         </Typography>
-                        <Typography variant="h6" sx={{ mt: 1 }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            mt: 1,
+                            color: isDark ? '#f7fbff' : 'text.primary',
+                            lineHeight: 1.35,
+                          }}
+                        >
                           {value}
                         </Typography>
                       </Paper>
@@ -262,8 +350,10 @@ const HomePage = () => {
                   p: 3,
                   height: '100%',
                   borderRadius: 5,
-                  border: '1px solid',
-                  borderColor: 'divider',
+                  transition: 'transform 180ms ease, box-shadow 180ms ease',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                  },
                 }}
               >
                 <Stack spacing={1.5}>
@@ -310,6 +400,8 @@ const HomePage = () => {
                     height: '100%',
                     borderRadius: 4,
                     bgcolor: 'action.hover',
+                    border: '1px solid',
+                    borderColor: 'divider',
                   }}
                 >
                   <Typography sx={{ lineHeight: 1.7 }}>{point}</Typography>

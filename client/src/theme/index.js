@@ -8,6 +8,9 @@ const paletteByMode = {
     background: '#f4f7fb',
     paper: 'rgba(255,255,255,0.92)',
     text: '#102033',
+    secondaryText: '#516173',
+    divider: 'rgba(16,32,51,0.09)',
+    hover: 'rgba(11,125,119,0.06)',
   },
   dark: {
     primary: '#36d1c4',
@@ -16,6 +19,9 @@ const paletteByMode = {
     background: '#081120',
     paper: 'rgba(16,25,44,0.92)',
     text: '#f3f6fb',
+    secondaryText: '#98a7bd',
+    divider: 'rgba(243,246,251,0.12)',
+    hover: 'rgba(255,255,255,0.06)',
   },
 };
 
@@ -37,6 +43,11 @@ export const buildTheme = (mode) => {
       },
       text: {
         primary: colors.text,
+        secondary: colors.secondaryText,
+      },
+      divider: colors.divider,
+      action: {
+        hover: colors.hover,
       },
     },
     typography: {
@@ -117,6 +128,11 @@ export const buildTheme = (mode) => {
             backgroundImage: 'none',
             backgroundColor: colors.paper,
             backdropFilter: 'blur(18px)',
+            border: `1px solid ${colors.divider}`,
+            boxShadow:
+              mode === 'dark'
+                ? '0 20px 45px rgba(0, 0, 0, 0.22)'
+                : '0 20px 45px rgba(15, 23, 42, 0.06)',
           },
         },
       },
@@ -124,6 +140,7 @@ export const buildTheme = (mode) => {
         styleOverrides: {
           root: {
             backgroundColor: colors.paper,
+            border: `1px solid ${colors.divider}`,
             boxShadow:
               mode === 'dark'
                 ? '0 24px 60px rgba(0, 0, 0, 0.32)'
@@ -136,6 +153,49 @@ export const buildTheme = (mode) => {
           root: {
             borderRadius: 14,
             paddingInline: 18,
+          },
+          outlined: {
+            borderColor: alpha(colors.primary, mode === 'dark' ? 0.42 : 0.28),
+            '&:hover': {
+              borderColor: colors.primary,
+              backgroundColor: alpha(colors.primary, mode === 'dark' ? 0.12 : 0.08),
+            },
+          },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          root: {
+            borderRadius: 999,
+            border: `1px solid ${alpha(colors.text, mode === 'dark' ? 0.12 : 0.08)}`,
+          },
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            backgroundColor: mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.74)',
+            borderRadius: 14,
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: alpha(colors.text, mode === 'dark' ? 0.16 : 0.14),
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: alpha(colors.primary, 0.5),
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderColor: colors.primary,
+              borderWidth: 2,
+            },
+          },
+          input: {
+            color: colors.text,
+          },
+        },
+      },
+      MuiInputLabel: {
+        styleOverrides: {
+          root: {
+            color: colors.secondaryText,
           },
         },
       },

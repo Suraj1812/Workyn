@@ -5,8 +5,18 @@ import { buildTheme } from '../theme/index.js';
 
 const ThemeModeContext = createContext(null);
 
+const getInitialMode = () => {
+  const savedMode = localStorage.getItem('workyn-theme');
+
+  if (savedMode) {
+    return savedMode;
+  }
+
+  return 'light';
+};
+
 export const ThemeModeProvider = ({ children }) => {
-  const [mode, setMode] = useState(() => localStorage.getItem('workyn-theme') || 'dark');
+  const [mode, setMode] = useState(getInitialMode);
 
   const toggleColorMode = useCallback(() => {
     setMode((previousMode) => {
