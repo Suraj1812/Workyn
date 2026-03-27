@@ -88,11 +88,7 @@ const DashboardPage = () => {
         <SectionCard
           title="Workspace momentum"
           subtitle="Today’s snapshot across the platform"
-          sx={{
-            mb: 3,
-            background:
-              'linear-gradient(135deg, rgba(11,125,119,0.18) 0%, rgba(250,140,22,0.16) 100%)',
-          }}
+          sx={{ mb: 3 }}
         >
           <Stack spacing={1}>
             <Typography variant="h5">See the pulse of your operation at a glance.</Typography>

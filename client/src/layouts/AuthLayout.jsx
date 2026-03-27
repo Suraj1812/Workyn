@@ -20,9 +20,8 @@ const AuthLayout = () => (
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              background:
-                'linear-gradient(180deg, rgba(10,19,36,0.92) 0%, rgba(17,35,61,0.88) 100%)',
-              color: '#f6f8fb',
+              background: 'transparent',
+              color: 'text.primary',
             }}
           >
             <div>
@@ -30,30 +29,30 @@ const AuthLayout = () => (
               <Typography variant="h3" sx={{ mb: 2, maxWidth: 360 }}>
                 The operating system for modern teams and practices.
               </Typography>
-              <Typography sx={{ color: 'rgba(255,255,255,0.72)', maxWidth: 430 }}>
+              <Typography color="text.secondary" sx={{ maxWidth: 430 }}>
                 Bring conversations, leads, resumes, and patient workflows into one focused
                 workspace with real-time collaboration at the center.
               </Typography>
             </div>
 
             <Stack spacing={2} sx={{ mt: 4 }}>
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+              <Typography variant="body2" color="text.secondary">
                 Real-time chat for teams
               </Typography>
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+              <Typography variant="body2" color="text.secondary">
                 CRM pipeline and activity tracking
               </Typography>
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+              <Typography variant="body2" color="text.secondary">
                 Resume builder with PDF export
               </Typography>
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+              <Typography variant="body2" color="text.secondary">
                 Clinic and appointment management
               </Typography>
             </Stack>
           </Paper>
         </Grid>
         <Grid item xs={12} md={7}>
-          <Paper sx={{ p: { xs: 3, md: 4 }, minHeight: '100%' }}>
+          <Paper sx={{ p: { xs: 3, md: 4 }, minHeight: '100%', borderRadius: 5 }}>
             <Outlet />
           </Paper>
         </Grid>

@@ -120,8 +120,7 @@ const DashboardLayout = () => {
           sx={{
             p: 2.5,
             borderRadius: 4,
-            background:
-              'linear-gradient(160deg, rgba(11,125,119,0.18) 0%, rgba(250,140,22,0.18) 100%)',
+            backgroundColor: 'transparent',
           }}
         >
           <Typography variant="subtitle1" sx={{ mb: 0.75 }}>
