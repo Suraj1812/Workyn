@@ -17,7 +17,7 @@ import {
 export const getSuggestions = async (req, res, next) => {
   try {
     const suggestions = await getVisibleSuggestions({
-      userId: req.user._id,
+      userId: req.user.id,
       module: req.query.module,
     });
 
@@ -34,7 +34,7 @@ export const respondToSuggestion = async (req, res, next) => {
   try {
     const suggestion = await getSuggestionById({
       suggestionId: req.params.id,
-      userId: req.user._id,
+      userId: req.user.id,
     });
 
     if (!suggestion) {
@@ -47,19 +47,20 @@ export const respondToSuggestion = async (req, res, next) => {
 
     if (accepted) {
       automation = await createAutomationFromSuggestion({
-        userId: req.user._id,
+        userId: req.user.id,
         suggestion,
       });
     }
 
-    const updatedSuggestion = await updateSuggestionByIdAndUser(suggestion._id, req.user._id, {
+    const updatedSuggestion = await updateSuggestionByIdAndUser(suggestion._id, req.user.id, {
       accepted,
       status: accepted ? 'accepted' : 'rejected',
       respondedAt: new Date(),
     });
 
     await processUserAction({
-      userId: req.user._id,
+      userId: req.user.id,
+      workspaceId: req.workspace.id,
       module: 'ai',
       actionType: accepted ? 'ai.suggestion_accepted' : 'ai.suggestion_rejected',
       metadata: {
@@ -81,7 +82,7 @@ export const respondToSuggestion = async (req, res, next) => {
 
 export const getAutomations = async (req, res, next) => {
   try {
-    const automations = await listAutomationsByUser(req.user._id);
+    const automations = await listAutomationsByUser(req.user.id);
 
     res.json({
       success: true,
@@ -94,14 +95,14 @@ export const getAutomations = async (req, res, next) => {
 
 export const updateAutomation = async (req, res, next) => {
   try {
-    const automation = await findAutomationByIdAndUser(req.params.id, req.user._id);
+    const automation = await findAutomationByIdAndUser(req.params.id, req.user.id);
 
     if (!automation) {
       res.status(404);
       throw new Error('Automation not found.');
     }
 
-    const updatedAutomation = await updateAutomationState(req.params.id, req.user._id, {
+    const updatedAutomation = await updateAutomationState(req.params.id, req.user.id, {
       active: req.body.active !== undefined ? Boolean(req.body.active) : automation.active,
     });
 
@@ -124,7 +125,8 @@ export const getQuickReplies = async (req, res, next) => {
     }
 
     const quickReplies = await getChatQuickReplies({
-      userId: req.user._id,
+      userId: req.user.id,
+      workspaceId: req.workspace.id,
       contactId,
     });
 
@@ -141,13 +143,13 @@ export const getAiOverview = async (req, res, next) => {
   try {
     const [pendingSuggestions, automationCount, resolvedSuggestions] = await Promise.all([
       countSuggestions({
-        userId: req.user._id,
+        userId: req.user.id,
         statuses: ['pending'],
         pendingVisibleOnly: true,
       }),
-      countActiveAutomations(req.user._id),
+      countActiveAutomations(req.user.id),
       countSuggestions({
-        userId: req.user._id,
+        userId: req.user.id,
         statuses: ['accepted', 'rejected'],
       }),
     ]);

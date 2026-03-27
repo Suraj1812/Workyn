@@ -22,11 +22,13 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 
 import EmptyState from '../../components/EmptyState.jsx';
-import LoadingScreen from '../../components/LoadingScreen.jsx';
 import PageHeader from '../../components/PageHeader.jsx';
 import SectionCard from '../../components/SectionCard.jsx';
+import Seo from '../../components/Seo.jsx';
 import AIModuleSuggestions from '../../components/ai/AIModuleSuggestions.jsx';
+import PageSkeleton from '../../components/feedback/PageSkeleton.jsx';
 import { useAI } from '../../context/AIContext.jsx';
+import useDebouncedValue from '../../hooks/useDebouncedValue.js';
 import clinicService from '../../services/clinicService.js';
 import { formatDateTime, getApiError } from '../../utils/formatters.js';
 
@@ -52,7 +54,9 @@ const ClinicPage = () => {
   const [form, setForm] = useState(createDefaultPatient);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [search, setSearch] = useState('');
   const { refreshAi } = useAI();
+  const debouncedSearch = useDebouncedValue(search, 350);
 
   const upcomingAppointments = useMemo(
     () =>
@@ -71,7 +75,10 @@ const ClinicPage = () => {
 
   const fetchPatients = async () => {
     try {
-      const response = await clinicService.getPatients();
+      const response = await clinicService.getPatients({
+        search: debouncedSearch || undefined,
+        limit: 50,
+      });
       setPatients(response.patients || []);
     } catch (fetchError) {
       setError(getApiError(fetchError, 'Unable to load patients.'));
@@ -82,7 +89,7 @@ const ClinicPage = () => {
 
   useEffect(() => {
     fetchPatients();
-  }, []);
+  }, [debouncedSearch]);
 
   const openCreateDialog = () => {
     setEditingPatient(null);
@@ -164,11 +171,27 @@ const ClinicPage = () => {
   };
 
   if (loading) {
-    return <LoadingScreen label="Loading clinic workspace..." />;
+    return (
+      <>
+        <Seo
+          title="Clinic Management"
+          description="Manage patients, appointments, histories, and clinic follow-ups from the Workyn workspace."
+          path="/clinic"
+          robots="noindex, nofollow, noarchive"
+        />
+        <PageSkeleton cards={3} />
+      </>
+    );
   }
 
   return (
     <Box>
+      <Seo
+        title="Clinic Management"
+        description="Manage patients, appointments, histories, and clinic follow-ups from the Workyn workspace."
+        path="/clinic"
+        robots="noindex, nofollow, noarchive"
+      />
       <PageHeader
         eyebrow="Clinic"
         title="Manage patients and appointments"
@@ -191,6 +214,15 @@ const ClinicPage = () => {
           {error}
         </Alert>
       ) : null}
+
+      <SectionCard title="Filters" subtitle="Search patient records quickly" sx={{ mb: 3 }}>
+        <TextField
+          fullWidth
+          label="Search patients"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
+      </SectionCard>
 
       {!patients.length ? (
         <EmptyState

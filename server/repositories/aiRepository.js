@@ -28,14 +28,29 @@ const suggestionUpdateFields = {
   sourceAutomation: { column: 'source_automation_id' },
 };
 
-export const createUserAction = async ({ userId, module, actionType, metadata, timestamp }) => {
+export const createUserAction = async ({
+  workspaceId,
+  userId,
+  module,
+  actionType,
+  metadata,
+  timestamp,
+}) => {
   const { rows } = await query(
     `
-      INSERT INTO user_actions (id, user_id, module, action_type, metadata, timestamp)
-      VALUES ($1, $2, $3, $4, $5::jsonb, $6)
+      INSERT INTO user_actions (id, workspace_id, user_id, module, action_type, metadata, timestamp)
+      VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7)
       RETURNING *
     `,
-    [createId(), userId, module, actionType, JSON.stringify(metadata), timestamp],
+    [
+      createId(),
+      workspaceId || null,
+      userId,
+      module,
+      actionType,
+      JSON.stringify(metadata),
+      timestamp,
+    ],
   );
 
   return mapUserAction(rows[0]);
@@ -122,6 +137,7 @@ export const findAutomationByIdAndUser = async (automationId, userId) => {
 };
 
 export const createAutomation = async ({
+  workspaceId,
   userId,
   name,
   description,
@@ -135,6 +151,7 @@ export const createAutomation = async ({
     `
       INSERT INTO automations (
         id,
+        workspace_id,
         user_id,
         name,
         description,
@@ -144,11 +161,12 @@ export const createAutomation = async ({
         source_suggestion_id,
         source_key
       )
-      VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb, $7, $8, $9)
+      VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, $8, $9, $10)
       RETURNING *
     `,
     [
       createId(),
+      workspaceId || null,
       userId,
       name,
       description,
@@ -253,6 +271,7 @@ export const touchAutomationExecution = async (automationId) => {
 };
 
 export const createSuggestion = async ({
+  workspaceId,
   userId,
   module,
   type,
@@ -269,6 +288,7 @@ export const createSuggestion = async ({
     `
       INSERT INTO suggestions (
         id,
+        workspace_id,
         user_id,
         module,
         type,
@@ -281,11 +301,12 @@ export const createSuggestion = async ({
         automation_payload,
         source_automation_id
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10, $11::jsonb, $12)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12::jsonb, $13)
       RETURNING *
     `,
     [
       createId(),
+      workspaceId || null,
       userId,
       module,
       type,

@@ -1,4 +1,4 @@
-import { SendRounded } from '@mui/icons-material';
+import { AttachFileRounded, SendRounded } from '@mui/icons-material';
 import {
   Alert,
   Avatar,
@@ -20,15 +20,18 @@ import EmptyState from '../../components/EmptyState.jsx';
 import LoadingScreen from '../../components/LoadingScreen.jsx';
 import PageHeader from '../../components/PageHeader.jsx';
 import SectionCard from '../../components/SectionCard.jsx';
+import Seo from '../../components/Seo.jsx';
 import AIModuleSuggestions from '../../components/ai/AIModuleSuggestions.jsx';
 import { useAI } from '../../context/AIContext.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 import aiService from '../../services/aiService.js';
 import { connectSocket } from '../../services/socket.js';
 import chatService from '../../services/chatService.js';
+import uploadService from '../../services/uploadService.js';
 import userService from '../../services/userService.js';
 import { formatDateTime, getApiError } from '../../utils/formatters.js';
 
-const extractUserId = (user) => (typeof user === 'string' ? user : user?._id);
+const extractUserId = (user) => (typeof user === 'string' ? user : user?.id || user?._id);
 
 const ChatPage = () => {
   const [contacts, setContacts] = useState([]);
@@ -38,14 +41,18 @@ const ChatPage = () => {
   const [loadingContacts, setLoadingContacts] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [draft, setDraft] = useState('');
+  const [pendingFile, setPendingFile] = useState(null);
   const [sending, setSending] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
   const [typing, setTyping] = useState(false);
   const [quickReplies, setQuickReplies] = useState([]);
   const [error, setError] = useState('');
   const selectedContactRef = useRef(null);
   const typingTimerRef = useRef(null);
   const bottomRef = useRef(null);
+  const fileInputRef = useRef(null);
   const { refreshAi } = useAI();
+  const { user } = useAuth();
 
   const sortedContacts = useMemo(
     () =>
@@ -197,7 +204,7 @@ const ChatPage = () => {
   const handleSend = async (event) => {
     event.preventDefault();
 
-    if (!draft.trim() || !selectedContact?._id) {
+    if ((!draft.trim() && !pendingFile) || !selectedContact?._id) {
       return;
     }
 
@@ -205,12 +212,32 @@ const ChatPage = () => {
     setError('');
     stopTyping();
 
-    const payload = {
-      receiverId: selectedContact._id,
-      message: draft.trim(),
-    };
-
     try {
+      let attachmentPayload = null;
+      if (pendingFile) {
+        setUploadingFile(true);
+        const uploadResponse = await uploadService.uploadFile({
+          file: pendingFile,
+          module: 'chat',
+        });
+        attachmentPayload = uploadResponse.file;
+      }
+
+      const payload = {
+        receiverId: selectedContact._id,
+        message: draft.trim(),
+        messageType: attachmentPayload ? 'file' : 'text',
+        attachment: attachmentPayload
+          ? {
+              id: attachmentPayload.id,
+              fileName: attachmentPayload.fileName,
+              url: attachmentPayload.url,
+              mimeType: attachmentPayload.mimeType,
+              sizeBytes: attachmentPayload.sizeBytes,
+            }
+          : undefined,
+      };
+
       const socket = connectSocket();
 
       let savedMessage;
@@ -238,20 +265,38 @@ const ChatPage = () => {
 
       setMessages((previousMessages) => [...previousMessages, savedMessage]);
       setDraft('');
+      setPendingFile(null);
       await refreshAi({ silent: true });
     } catch (sendError) {
       setError(getApiError(sendError, 'Unable to send message.'));
     } finally {
+      setUploadingFile(false);
       setSending(false);
     }
   };
 
   if (loadingContacts) {
-    return <LoadingScreen label="Loading chat..." />;
+    return (
+      <>
+        <Seo
+          title="Team Chat"
+          description="Collaborate in realtime with Workyn chat, file sharing, quick replies, and AI-assisted messaging."
+          path="/chat"
+          robots="noindex, nofollow, noarchive"
+        />
+        <LoadingScreen label="Loading chat..." />
+      </>
+    );
   }
 
   return (
     <Box>
+      <Seo
+        title="Team Chat"
+        description="Collaborate in realtime with Workyn chat, file sharing, quick replies, and AI-assisted messaging."
+        path="/chat"
+        robots="noindex, nofollow, noarchive"
+      />
       <PageHeader
         eyebrow="Realtime chat"
         title="Keep conversations moving"
@@ -348,6 +393,18 @@ const ChatPage = () => {
                           }}
                         >
                           <Typography variant="body1">{message.message}</Typography>
+                          {message.attachment?.url ? (
+                            <Button
+                              component="a"
+                              href={message.attachment.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              size="small"
+                              sx={{ mt: 1, color: 'inherit', px: 0 }}
+                            >
+                              {message.attachment.fileName || 'Open attachment'}
+                            </Button>
+                          ) : null}
                         </Box>
                         <Typography variant="caption" color="text.secondary" sx={{ mt: 0.75 }}>
                           {formatDateTime(message.timestamp || message.createdAt)}
@@ -378,6 +435,19 @@ const ChatPage = () => {
                       ))}
                     </Stack>
                   ) : null}
+                  {pendingFile ? (
+                    <Chip
+                      label={pendingFile.name}
+                      onDelete={() => setPendingFile(null)}
+                      sx={{ mb: 1.5 }}
+                    />
+                  ) : null}
+                  <input
+                    ref={fileInputRef}
+                    hidden
+                    type="file"
+                    onChange={(event) => setPendingFile(event.target.files?.[0] || null)}
+                  />
                   <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
                     <TextField
                       fullWidth
@@ -386,10 +456,18 @@ const ChatPage = () => {
                       onChange={handleDraftChange}
                     />
                     <Button
+                      variant="outlined"
+                      startIcon={<AttachFileRounded />}
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={user?.currentWorkspace?.plan !== 'pro' || uploadingFile}
+                    >
+                      {uploadingFile ? 'Uploading...' : 'Attach'}
+                    </Button>
+                    <Button
                       type="submit"
                       variant="contained"
                       endIcon={<SendRounded />}
-                      disabled={sending || !draft.trim()}
+                      disabled={sending || (!draft.trim() && !pendingFile)}
                     >
                       {sending ? 'Sending...' : 'Send'}
                     </Button>

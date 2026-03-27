@@ -7,7 +7,10 @@ export const getSocket = () => {
     socketInstance = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000', {
       autoConnect: false,
       withCredentials: true,
-      transports: ['websocket', 'polling'],
+      transports: ['websocket'],
+      reconnection: true,
+      reconnectionAttempts: 8,
+      reconnectionDelayMax: 4000,
     });
   }
 

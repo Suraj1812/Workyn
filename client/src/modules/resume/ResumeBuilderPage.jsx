@@ -5,13 +5,12 @@ import {
   SaveRounded,
 } from '@mui/icons-material';
 import { Alert, Box, Button, Grid, IconButton, Stack, TextField } from '@mui/material';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { useEffect, useRef, useState } from 'react';
 
 import LoadingScreen from '../../components/LoadingScreen.jsx';
 import PageHeader from '../../components/PageHeader.jsx';
 import SectionCard from '../../components/SectionCard.jsx';
+import Seo from '../../components/Seo.jsx';
 import AIModuleSuggestions from '../../components/ai/AIModuleSuggestions.jsx';
 import { useAI } from '../../context/AIContext.jsx';
 import resumeService from '../../services/resumeService.js';
@@ -112,6 +111,11 @@ const ResumeBuilderPage = () => {
     setStatus({ type: '', message: '' });
 
     try {
+      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf'),
+      ]);
+
       const canvas = await html2canvas(previewRef.current, {
         scale: 2,
         backgroundColor: '#ffffff',
@@ -146,11 +150,27 @@ const ResumeBuilderPage = () => {
   };
 
   if (loading) {
-    return <LoadingScreen label="Loading resume builder..." />;
+    return (
+      <>
+        <Seo
+          title="Resume Builder"
+          description="Create, edit, preview, and export professional resumes with Workyn's built-in resume builder."
+          path="/resume"
+          robots="noindex, nofollow, noarchive"
+        />
+        <LoadingScreen label="Loading resume builder..." />
+      </>
+    );
   }
 
   return (
     <Box>
+      <Seo
+        title="Resume Builder"
+        description="Create, edit, preview, and export professional resumes with Workyn's built-in resume builder."
+        path="/resume"
+        robots="noindex, nofollow, noarchive"
+      />
       <PageHeader
         eyebrow="Resume builder"
         title="Write and export polished resumes"

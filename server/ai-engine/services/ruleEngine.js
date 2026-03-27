@@ -58,6 +58,7 @@ export const createAutomationFromSuggestion = async ({ userId, suggestion }) => 
   }
 
   return createAutomation({
+    workspaceId: suggestion.workspaceId,
     userId,
     name: payload.name,
     description: payload.description || '',
@@ -70,6 +71,7 @@ export const createAutomationFromSuggestion = async ({ userId, suggestion }) => 
 };
 
 export const executeTriggerAutomations = async ({
+  workspaceId,
   userId,
   actionType,
   metadata = {},
@@ -96,6 +98,7 @@ export const executeTriggerAutomations = async ({
       });
 
       const suggestionPayload = {
+        workspaceId,
         userId,
         module: automation.action?.module || 'dashboard',
         type: 'automation',

@@ -1,8 +1,10 @@
 import api from './api.js';
 
 const crmService = {
-  getLeads: async () => {
-    const { data } = await api.get('/crm');
+  getLeads: async (params) => {
+    const { data } = await api.get('/crm', {
+      params,
+    });
     return data;
   },
   createLead: async (payload) => {

@@ -3,12 +3,15 @@ import { getOnlineUserIds } from '../sockets/chatSocket.js';
 
 export const getUsers = async (req, res, next) => {
   try {
-    const users = await listUsersExcept(req.user._id);
+    const users = await listUsersExcept({
+      userId: req.user.id || req.user._id,
+      workspaceId: req.workspace.id,
+    });
 
     res.json({
       success: true,
       users,
-      onlineUserIds: getOnlineUserIds(),
+      onlineUserIds: getOnlineUserIds(req.workspace.id),
     });
   } catch (error) {
     next(error);

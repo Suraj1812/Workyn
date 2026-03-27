@@ -1,5 +1,6 @@
 import { processUserAction } from '../ai-engine/services/behaviorTracker.js';
 import { findResumeByUser, upsertResume } from '../repositories/resumesRepository.js';
+import { recordActivity } from '../services/activityService.js';
 
 const emptyResume = {
   personal: {
@@ -16,10 +17,11 @@ const emptyResume = {
 export const saveResume = async (req, res, next) => {
   try {
     const { data = emptyResume, template = 'modern' } = req.body;
-    const existingResume = await findResumeByUser(req.user._id);
+    const existingResume = await findResumeByUser(req.user.id, req.workspace.id);
 
     const resume = await upsertResume({
-      userId: req.user._id,
+      userId: req.user.id,
+      workspaceId: req.workspace.id,
       data,
       template,
     });
@@ -31,14 +33,28 @@ export const saveResume = async (req, res, next) => {
     );
 
     await processUserAction({
-      userId: req.user._id,
+      userId: req.user.id,
+      workspaceId: req.workspace.id,
       module: 'resume',
       actionType: 'resume.saved',
       metadata: {
-        resumeId: resume._id.toString(),
+        resumeId: resume.id,
         isNewResume: !existingResume,
         changedSections,
         resumeData: resume.data,
+      },
+    });
+
+    await recordActivity({
+      workspaceId: req.workspace.id,
+      userId: req.user.id,
+      module: 'resume',
+      action: 'resume.saved',
+      entityType: 'resume',
+      entityId: resume.id,
+      description: `${req.user.name} saved a resume draft.`,
+      metadata: {
+        changedSections,
       },
     });
 
@@ -50,12 +66,13 @@ export const saveResume = async (req, res, next) => {
 
 export const getResume = async (req, res, next) => {
   try {
-    const resume = await findResumeByUser(req.user._id);
+    const resume = await findResumeByUser(req.user.id, req.workspace.id);
 
     res.json({
       success: true,
       resume: resume || {
-        userId: req.user._id,
+        userId: req.user.id,
+        workspaceId: req.workspace.id,
         data: emptyResume,
         template: 'modern',
       },

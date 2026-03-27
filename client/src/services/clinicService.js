@@ -1,8 +1,10 @@
 import api from './api.js';
 
 const clinicService = {
-  getPatients: async () => {
-    const { data } = await api.get('/patients');
+  getPatients: async (params) => {
+    const { data } = await api.get('/patients', {
+      params,
+    });
     return data;
   },
   createPatient: async (payload) => {

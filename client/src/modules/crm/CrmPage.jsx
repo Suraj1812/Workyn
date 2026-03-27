@@ -23,11 +23,13 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 
 import EmptyState from '../../components/EmptyState.jsx';
-import LoadingScreen from '../../components/LoadingScreen.jsx';
 import PageHeader from '../../components/PageHeader.jsx';
 import SectionCard from '../../components/SectionCard.jsx';
+import Seo from '../../components/Seo.jsx';
 import AIModuleSuggestions from '../../components/ai/AIModuleSuggestions.jsx';
+import PageSkeleton from '../../components/feedback/PageSkeleton.jsx';
 import { useAI } from '../../context/AIContext.jsx';
+import useDebouncedValue from '../../hooks/useDebouncedValue.js';
 import crmService from '../../services/crmService.js';
 import { formatDateTime, getApiError } from '../../utils/formatters.js';
 
@@ -53,7 +55,10 @@ const CrmPage = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const { refreshAi } = useAI();
+  const debouncedSearch = useDebouncedValue(search, 350);
 
   const groupedLeads = useMemo(
     () =>
@@ -66,7 +71,11 @@ const CrmPage = () => {
 
   const fetchLeads = async () => {
     try {
-      const response = await crmService.getLeads();
+      const response = await crmService.getLeads({
+        search: debouncedSearch || undefined,
+        status: statusFilter || undefined,
+        limit: 50,
+      });
       setLeads(response.leads || []);
     } catch (fetchError) {
       setError(getApiError(fetchError, 'Unable to load leads.'));
@@ -77,7 +86,7 @@ const CrmPage = () => {
 
   useEffect(() => {
     fetchLeads();
-  }, []);
+  }, [debouncedSearch, statusFilter]);
 
   const openCreateDialog = () => {
     setEditingLead(null);
@@ -134,11 +143,27 @@ const CrmPage = () => {
   };
 
   if (loading) {
-    return <LoadingScreen label="Loading CRM..." />;
+    return (
+      <>
+        <Seo
+          title="CRM"
+          description="Track leads, statuses, notes, follow-ups, and pipeline momentum inside Workyn CRM."
+          path="/crm"
+          robots="noindex, nofollow, noarchive"
+        />
+        <PageSkeleton cards={3} />
+      </>
+    );
   }
 
   return (
     <Box>
+      <Seo
+        title="CRM"
+        description="Track leads, statuses, notes, follow-ups, and pipeline momentum inside Workyn CRM."
+        path="/crm"
+        robots="noindex, nofollow, noarchive"
+      />
       <PageHeader
         eyebrow="CRM"
         title="Manage your pipeline"
@@ -161,6 +186,35 @@ const CrmPage = () => {
           {error}
         </Alert>
       ) : null}
+
+      <SectionCard title="Filters" subtitle="Search and narrow the current pipeline" sx={{ mb: 3 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={8}>
+            <TextField
+              fullWidth
+              label="Search leads"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              select
+              fullWidth
+              label="Status"
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+            >
+              <MenuItem value="">All statuses</MenuItem>
+              {statuses.map((status) => (
+                <MenuItem key={status} value={status}>
+                  {status}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+        </Grid>
+      </SectionCard>
 
       {!leads.length ? (
         <EmptyState

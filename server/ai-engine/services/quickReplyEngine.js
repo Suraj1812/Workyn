@@ -47,11 +47,12 @@ const uniqueReplies = (replies) => {
   });
 };
 
-export const getChatQuickReplies = async ({ userId, contactId }) => {
+export const getChatQuickReplies = async ({ userId, contactId, workspaceId }) => {
   const [recentIncomingMessage, activeTemplateAutomations] = await Promise.all([
     findLatestIncomingMessage({
       userId,
       contactId,
+      workspaceId,
     }),
     listChatTemplateAutomations(userId, 4),
   ]);

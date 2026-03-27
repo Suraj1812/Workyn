@@ -9,9 +9,9 @@ import {
 
 export const createSuggestion = async (payload) => createSuggestionRecord(payload);
 
-export const upsertSuggestion = async ({ userId, dedupeKey, ...payload }) => {
+export const upsertSuggestion = async ({ workspaceId, userId, dedupeKey, ...payload }) => {
   if (!dedupeKey) {
-    return createSuggestion({ userId, ...payload });
+    return createSuggestion({ workspaceId, userId, ...payload });
   }
 
   const existingSuggestion = await findPendingSuggestionByDedupeKey(userId, dedupeKey);
@@ -35,6 +35,7 @@ export const upsertSuggestion = async ({ userId, dedupeKey, ...payload }) => {
   }
 
   return createSuggestion({
+    workspaceId,
     userId,
     dedupeKey,
     ...payload,

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Workyn favicon</title>
+  <desc id="desc">Gradient rounded-square favicon with a bold W monogram.</desc>
+  <defs>
+    <linearGradient id="bg" x1="12" y1="12" x2="116" y2="116" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0b7d77"/>
+      <stop offset="1" stop-color="#fa8c16"/>
+    </linearGradient>
+  </defs>
+  <rect x="10" y="10" width="108" height="108" rx="28" fill="url(#bg)"/>
+  <path d="M28 39h14l10 34 12-27h1l12 27 10-34h14l-18 50H81L64.5 57 48 89H46z" fill="#f8fbff"/>
+</svg>

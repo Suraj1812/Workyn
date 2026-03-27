@@ -1,13 +1,19 @@
 import {
   AccountCircleRounded,
+  AnalyticsRounded,
   AssignmentIndRounded,
   AutoAwesomeRounded,
   ChatRounded,
   DarkModeRounded,
+  HistoryRounded,
   LightModeRounded,
   LogoutRounded,
   MenuRounded,
   MonitorHeartRounded,
+  NotificationsRounded,
+  PaidRounded,
+  PeopleRounded,
+  SettingsRounded,
   SpaceDashboardRounded,
 } from '@mui/icons-material';
 import {
@@ -15,6 +21,7 @@ import {
   Avatar,
   Badge,
   Box,
+  Chip,
   Divider,
   Drawer,
   IconButton,
@@ -31,8 +38,11 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 
 import AIPanelDrawer from '../components/ai/AIPanelDrawer.jsx';
+import NotificationDrawer from '../components/notifications/NotificationDrawer.jsx';
+import GlobalSearchBox from '../components/search/GlobalSearchBox.jsx';
 import { useAI } from '../context/AIContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useNotifications } from '../context/NotificationsContext.jsx';
 import { useThemeMode } from '../context/ThemeModeContext.jsx';
 
 const drawerWidth = 280;
@@ -40,8 +50,10 @@ const drawerWidth = 280;
 const DashboardLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [aiPanelOpen, setAiPanelOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const { user, logout } = useAuth();
   const { summary } = useAI();
+  const { unreadCount } = useNotifications();
   const { mode, toggleColorMode } = useThemeMode();
   const location = useLocation();
   const navigate = useNavigate();
@@ -53,6 +65,11 @@ const DashboardLayout = () => {
       { label: 'CRM', path: '/crm', icon: <AssignmentIndRounded /> },
       { label: 'Resume Builder', path: '/resume', icon: <AccountCircleRounded /> },
       { label: 'Clinic', path: '/clinic', icon: <MonitorHeartRounded /> },
+      { label: 'Analytics', path: '/analytics', icon: <AnalyticsRounded /> },
+      { label: 'Activity', path: '/activity', icon: <HistoryRounded /> },
+      { label: 'Team', path: '/team', icon: <PeopleRounded /> },
+      { label: 'Billing', path: '/billing', icon: <PaidRounded /> },
+      { label: 'Settings', path: '/settings', icon: <SettingsRounded /> },
     ],
     [],
   );
@@ -138,12 +155,27 @@ const DashboardLayout = () => {
             <Typography variant="h6">
               {navItems.find((item) => item.path === location.pathname)?.label || 'Workyn'}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Welcome back, {user?.name}
-            </Typography>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
+              <Typography variant="body2" color="text.secondary">
+                Welcome back, {user?.name}
+              </Typography>
+              <Chip
+                size="small"
+                color={user?.currentWorkspace?.plan === 'pro' ? 'secondary' : 'default'}
+                label={(user?.currentWorkspace?.plan || 'free').toUpperCase()}
+              />
+            </Stack>
           </Box>
 
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack direction="row" spacing={1.25} alignItems="center">
+            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+              <GlobalSearchBox />
+            </Box>
+            <IconButton color="inherit" onClick={() => setNotificationsOpen(true)}>
+              <Badge badgeContent={unreadCount} color="error" invisible={!unreadCount}>
+                <NotificationsRounded />
+              </Badge>
+            </IconButton>
             <IconButton color="inherit" onClick={() => setAiPanelOpen(true)}>
               <Badge
                 badgeContent={summary.pendingSuggestions}
@@ -162,11 +194,13 @@ const DashboardLayout = () => {
               alignItems="center"
               sx={{ display: { xs: 'none', sm: 'flex' } }}
             >
-              <Avatar sx={{ bgcolor: 'primary.main' }}>{user?.name?.[0] || 'W'}</Avatar>
+              <Avatar src={user?.avatarUrl || undefined} sx={{ bgcolor: 'primary.main' }}>
+                {user?.name?.[0] || 'W'}
+              </Avatar>
               <Box>
                 <Typography variant="subtitle2">{user?.name}</Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {user?.email}
+                  {user?.currentWorkspace?.name || user?.email}
                 </Typography>
               </Box>
             </Stack>
@@ -215,6 +249,7 @@ const DashboardLayout = () => {
       </Box>
 
       <AIPanelDrawer open={aiPanelOpen} onClose={() => setAiPanelOpen(false)} />
+      <NotificationDrawer open={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
     </Box>
   );
 };

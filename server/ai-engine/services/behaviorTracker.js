@@ -6,6 +6,7 @@ import { runActionPatternAnalysis, runScheduledAnalysis } from './patternDetecto
 import { executeTriggerAutomations } from './ruleEngine.js';
 
 export const processUserAction = async ({
+  workspaceId,
   userId,
   module,
   actionType,
@@ -14,6 +15,7 @@ export const processUserAction = async ({
 }) => {
   try {
     const action = await createUserAction({
+      workspaceId,
       userId,
       module,
       actionType,
@@ -23,6 +25,7 @@ export const processUserAction = async ({
 
     await Promise.all([
       runActionPatternAnalysis({
+        workspaceId,
         userId,
         module,
         actionType,
@@ -30,6 +33,7 @@ export const processUserAction = async ({
         timestamp: action.timestamp,
       }),
       executeTriggerAutomations({
+        workspaceId,
         userId,
         actionType,
         metadata,

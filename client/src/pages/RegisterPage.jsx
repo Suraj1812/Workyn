@@ -1,12 +1,16 @@
 import { Alert, Box, Button, Stack, TextField, Typography } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
 
+import Seo from '../components/Seo.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import workspaceService from '../services/workspaceService.js';
 import { getApiError } from '../utils/formatters.js';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { register } = useAuth();
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [submitting, setSubmitting] = useState(false);
@@ -19,7 +23,17 @@ const RegisterPage = () => {
 
     try {
       await register(form);
-      navigate('/dashboard', { replace: true });
+      const inviteToken = searchParams.get('inviteToken');
+      if (inviteToken) {
+        await workspaceService.acceptInvite(inviteToken);
+      }
+
+      const redirectTo = location.state?.from
+        ? `${location.state.from.pathname}${location.state.from.search || ''}`
+        : inviteToken
+          ? '/team'
+          : '/dashboard';
+      navigate(redirectTo, { replace: true });
     } catch (submitError) {
       setError(getApiError(submitError, 'Unable to create account.'));
     } finally {
@@ -29,12 +43,23 @@ const RegisterPage = () => {
 
   return (
     <Box>
+      <Seo
+        title="Create Account"
+        description="Create a Workyn workspace to manage team chat, CRM, resume workflows, clinic operations, automation, and analytics in one place."
+        path="/register"
+        robots="noindex, nofollow, noarchive"
+      />
       <Typography variant="h4" sx={{ mb: 1 }}>
         Create your Workyn workspace
       </Typography>
       <Typography color="text.secondary" sx={{ mb: 4 }}>
         Launch a unified control center for conversations, clients, talent, and care.
       </Typography>
+      {searchParams.get('inviteToken') ? (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          Create your account to join the invited workspace.
+        </Alert>
+      ) : null}
 
       <Stack component="form" spacing={2.5} onSubmit={handleSubmit}>
         {error ? <Alert severity="error">{error}</Alert> : null}

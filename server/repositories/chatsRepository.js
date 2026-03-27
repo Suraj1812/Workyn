@@ -15,14 +15,40 @@ const chatSelect = `
   INNER JOIN users AS receiver ON receiver.id = chats.receiver_id
 `;
 
-export const createChat = async ({ senderId, receiverId, message, timestamp = new Date() }) => {
+export const createChat = async ({
+  workspaceId,
+  senderId,
+  receiverId,
+  message,
+  messageType = 'text',
+  attachment = null,
+  timestamp = new Date(),
+}) => {
   const { rows } = await query(
     `
-      INSERT INTO chats (id, sender_id, receiver_id, message, timestamp)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO chats (
+        id,
+        workspace_id,
+        sender_id,
+        receiver_id,
+        message,
+        message_type,
+        attachment,
+        timestamp
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8)
       RETURNING id
     `,
-    [createId(), senderId, receiverId, message, timestamp],
+    [
+      createId(),
+      workspaceId,
+      senderId,
+      receiverId,
+      message,
+      messageType,
+      attachment ? JSON.stringify(attachment) : null,
+      timestamp,
+    ],
   );
 
   return findChatById(rows[0].id);
@@ -41,27 +67,36 @@ export const findChatById = async (chatId) => {
   return rows[0] ? mapChat(rows[0]) : null;
 };
 
-export const listMessages = async ({ userId, contactId }) => {
+export const listMessages = async ({ workspaceId, userId, contactId, limit = 50, offset = 0 }) => {
   const params = [userId];
-  let whereClause = `
-    WHERE chats.sender_id = $1 OR chats.receiver_id = $1
-  `;
+  const filters = [];
+
+  if (workspaceId) {
+    params.unshift(workspaceId);
+    filters.push('chats.workspace_id = $1');
+    filters.push('(chats.sender_id = $2 OR chats.receiver_id = $2)');
+  } else {
+    filters.push('(chats.sender_id = $1 OR chats.receiver_id = $1)');
+  }
 
   if (contactId) {
     params.push(contactId);
-    whereClause = `
-      WHERE
-        (chats.sender_id = $1 AND chats.receiver_id = $2)
-        OR
-        (chats.sender_id = $2 AND chats.receiver_id = $1)
-    `;
+    const userParam = workspaceId ? 2 : 1;
+    const contactParam = params.length;
+    filters.push(
+      `((chats.sender_id = $${userParam} AND chats.receiver_id = $${contactParam}) OR (chats.sender_id = $${contactParam} AND chats.receiver_id = $${userParam}))`,
+    );
   }
+
+  params.push(limit, offset);
 
   const { rows } = await query(
     `
       ${chatSelect}
-      ${whereClause}
+      WHERE ${filters.join(' AND ')}
       ORDER BY chats.timestamp ASC
+      LIMIT $${params.length - 1}
+      OFFSET $${params.length}
     `,
     params,
   );
@@ -69,42 +104,65 @@ export const listMessages = async ({ userId, contactId }) => {
   return rows.map((row) => mapChat(row));
 };
 
-export const countChatsForUser = async (userId) => {
+export const countChatsForUser = async (userId, workspaceId) => {
+  const params = [userId];
+  const workspaceClause = workspaceId ? 'workspace_id = $2 AND ' : '';
+
+  if (workspaceId) {
+    params.push(workspaceId);
+  }
+
   const { rows } = await query(
     `
       SELECT COUNT(*)::int AS count
       FROM chats
-      WHERE sender_id = $1 OR receiver_id = $1
+      WHERE ${workspaceClause}(sender_id = $1 OR receiver_id = $1)
     `,
-    [userId],
+    params,
   );
 
   return rows[0]?.count || 0;
 };
 
-export const listRecentChatsForUser = async (userId, limit = 3) => {
+export const listRecentChatsForUser = async (userId, limit = 3, workspaceId) => {
+  const params = [userId, limit];
+  const workspaceClause = workspaceId ? 'AND chats.workspace_id = $3' : '';
+
+  if (workspaceId) {
+    params.push(workspaceId);
+  }
+
   const { rows } = await query(
     `
       ${chatSelect}
-      WHERE chats.sender_id = $1 OR chats.receiver_id = $1
+      WHERE (chats.sender_id = $1 OR chats.receiver_id = $1)
+      ${workspaceClause}
       ORDER BY chats.timestamp DESC
       LIMIT $2
     `,
-    [userId, limit],
+    params,
   );
 
   return rows.map((row) => mapChat(row));
 };
 
-export const findLatestIncomingMessage = async ({ userId, contactId }) => {
+export const findLatestIncomingMessage = async ({ userId, contactId, workspaceId }) => {
+  const params = [contactId, userId];
+  const workspaceClause = workspaceId ? 'AND chats.workspace_id = $3' : '';
+
+  if (workspaceId) {
+    params.push(workspaceId);
+  }
+
   const { rows } = await query(
     `
       ${chatSelect}
       WHERE chats.sender_id = $1 AND chats.receiver_id = $2
+      ${workspaceClause}
       ORDER BY chats.timestamp DESC
       LIMIT 1
     `,
-    [contactId, userId],
+    params,
   );
 
   return rows[0] ? mapChat(rows[0]) : null;

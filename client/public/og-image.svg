@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Workyn social preview</title>
+  <desc id="desc">Promotional social card for Workyn showing the platform value proposition.</desc>
+  <defs>
+    <linearGradient id="bg" x1="110" y1="60" x2="1090" y2="570" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#071826"/>
+      <stop offset="0.54" stop-color="#0b7d77"/>
+      <stop offset="1" stop-color="#fa8c16"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="rgba(255,255,255,0.22)"/>
+      <stop offset="1" stop-color="rgba(255,255,255,0.08)"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" rx="40" fill="url(#bg)"/>
+  <rect x="70" y="70" width="1060" height="490" rx="32" fill="rgba(6,16,28,0.26)" stroke="rgba(255,255,255,0.18)"/>
+  <rect x="730" y="145" width="300" height="110" rx="24" fill="rgba(255,255,255,0.14)"/>
+  <rect x="730" y="285" width="300" height="110" rx="24" fill="rgba(255,255,255,0.14)"/>
+  <rect x="730" y="425" width="300" height="60" rx="22" fill="rgba(255,255,255,0.14)"/>
+  <text x="110" y="180" fill="#eaf8ff" font-size="52" font-family="Space Grotesk, Arial, sans-serif" font-weight="700">Workyn</text>
+  <text x="110" y="265" fill="#ffffff" font-size="76" font-family="Space Grotesk, Arial, sans-serif" font-weight="700">
+    AI-powered SaaS for
+  </text>
+  <text x="110" y="350" fill="#ffffff" font-size="76" font-family="Space Grotesk, Arial, sans-serif" font-weight="700">
+    chat, CRM, hiring,
+  </text>
+  <text x="110" y="435" fill="#ffffff" font-size="76" font-family="Space Grotesk, Arial, sans-serif" font-weight="700">
+    and clinic ops.
+  </text>
+  <text x="110" y="505" fill="#d7edf7" font-size="30" font-family="Manrope, Arial, sans-serif">
+    One workspace for collaboration, automation, analytics, billing, and operational visibility.
+  </text>
+  <text x="755" y="212" fill="#f8fbff" font-size="30" font-family="Manrope, Arial, sans-serif" font-weight="700">Realtime chat</text>
+  <text x="755" y="350" fill="#f8fbff" font-size="30" font-family="Manrope, Arial, sans-serif" font-weight="700">CRM + patient flows</text>
+  <text x="755" y="465" fill="#f8fbff" font-size="30" font-family="Manrope, Arial, sans-serif" font-weight="700">Resume builder + AI</text>
+  <path d="M760 110h42l31 116 41-90h3l41 90 31-116h42l-54 160h-47l-16-36-39-86-39 86-16 36h-47z" fill="#ffffff"/>
+</svg>

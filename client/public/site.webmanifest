@@ -1,0 +1,17 @@
+{
+  "name": "Workyn",
+  "short_name": "Workyn",
+  "description": "AI-powered SaaS for team chat, CRM, resume workflows, and clinic operations.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#081120",
+  "theme_color": "#0b7d77",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Workyn app icon</title>
+  <desc id="desc">Gradient icon for the Workyn productivity platform.</desc>
+  <defs>
+    <linearGradient id="surface" x1="64" y1="48" x2="448" y2="464" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0b7d77"/>
+      <stop offset="0.52" stop-color="#16a596"/>
+      <stop offset="1" stop-color="#fa8c16"/>
+    </linearGradient>
+  </defs>
+  <rect x="36" y="36" width="440" height="440" rx="120" fill="url(#surface)"/>
+  <path d="M114 156h52l39 145 51-113h4l51 113 39-145h52l-67 200h-58l-20-45-49-108-49 108-20 45h-58z" fill="#f7fbff"/>
+</svg>
